@@ -15,7 +15,6 @@ public class ClientPanel extends Parent {
 	private TextFlow receivedText;
 	private Button sendBtn;
 	private Button clearBtn;
-	//private Label messageAEnvoye  = new Label();
 	public ClientPanel() {
 		
 		this.textToSend = new TextArea();
@@ -23,7 +22,6 @@ public class ClientPanel extends Parent {
 		this.receivedText = new TextFlow();
 		this.sendBtn = new Button();
 		this.clearBtn = new Button();
-		//this.messageAEnvoye.setText(""); 
 		
 		this.getChildren().add(this.scrollReceivedText);
 		this.getChildren().add(this.textToSend);
@@ -35,6 +33,7 @@ public class ClientPanel extends Parent {
 		scrollReceivedText.setLayoutY(50);
 		scrollReceivedText.setPrefWidth(400);
 		scrollReceivedText.setPrefHeight(350);
+		scrollReceivedText.setFitToWidth(true);
 		scrollReceivedText.setContent(receivedText);
 		scrollReceivedText.vvalueProperty().bind(receivedText.heightProperty());
 		
@@ -70,20 +69,18 @@ public class ClientPanel extends Parent {
 			@Override
 			public void handle(ActionEvent event) 
 			{
-				Label messageAEnvoye = new Label();
-				//String messageAEnvoye = "";
-				//messageAEnvoye.setText(textToSend.getText() + "\n");			
-				//receivedText.getChildren().add(messageAEnvoye);
 				
+				Label messageAEnvoye = new Label();			
+				//Retour à la ligne lorsqu'il n'y a plus de place
+				messageAEnvoye.setWrapText(true);
+				//Le label prend toute la largeur du chat
+				messageAEnvoye.setPrefWidth(398);
+				
+				//Le label prend la valeur érit 
 				messageAEnvoye.setText(textToSend.getText());
-				//messageAEnvoye = textToSend.getText();
+							
 				
-				
-				//messageAEnvoye.setLayoutX()
-				
-				
-				receivedText.getChildren().add(messageAEnvoye);
-				
+				receivedText.getChildren().add(messageAEnvoye);		
 				textToSend.setText("");
 				
 			}
