@@ -9,12 +9,15 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.text.TextFlow;
 
+//import Morpion.Controller.Reseau.Client.;
+
 public class ClientPanel extends Parent {
 	private TextArea textToSend;
 	private ScrollPane scrollReceivedText;
 	private TextFlow receivedText;
 	private Button sendBtn;
 	private Button clearBtn;
+	private String tmpMess;
 	public ClientPanel() {
 		
 		this.textToSend = new TextArea();
@@ -22,6 +25,7 @@ public class ClientPanel extends Parent {
 		this.receivedText = new TextFlow();
 		this.sendBtn = new Button();
 		this.clearBtn = new Button();
+		this.tmpMess = "";
 		
 		this.getChildren().add(this.scrollReceivedText);
 		this.getChildren().add(this.textToSend);
@@ -82,6 +86,33 @@ public class ClientPanel extends Parent {
 				
 				receivedText.getChildren().add(messageAEnvoye);		
 				textToSend.setText("");
+				
+				
+			}
+		});
+		
+		
+		clearBtn.setOnAction(new EventHandler<ActionEvent>() 
+		{
+			@Override
+			public void handle(ActionEvent event) 
+			{
+				
+				Label messageAEnvoye = new Label();			
+				//Retour à la ligne lorsqu'il n'y a plus de place
+				messageAEnvoye.setWrapText(true);
+				//Le label prend toute la largeur du chat
+				messageAEnvoye.setPrefWidth(398);
+				
+				//Le label prend la valeur érit 
+				messageAEnvoye.setText(textToSend.getText());
+							
+				
+				receivedText.getChildren().add(messageAEnvoye);
+				
+				tmpMess = messageAEnvoye.getText();
+				//
+				
 				
 			}
 		});
