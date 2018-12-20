@@ -10,18 +10,18 @@ import Morpion.Controller.Reseau.Server.Connection;
 //import server.ServerSocket;
 
 public class Client {
-	//private int id;
 	private String address;
 	private int port;
 	private Socket socket;
 	private ObjectInputStream in;
 	private ObjectOutputStream out;
+	
+	private Thread threadClientSend;
+	private ClientSend leClientSend;
 
 
-
-	public Client(String uneAdresse, int unPort)
+	public Client(String uneAdresse, int unPort, String unPseudo)
 	{
-		//this.id = unId;
 		this.address = uneAdresse;
 		this.port = unPort;
 		try
@@ -35,7 +35,8 @@ public class Client {
 			System.out.println(e.getMessage());
 		}
 		
-		Thread threadClientSend = new Thread(new ClientSend(this.socket, this.out));
+		this.leClientSend = new ClientSend(this.socket, this.out, unPseudo);
+		this.threadClientSend = new Thread(this.leClientSend);
 		Thread threadClientReceive = new Thread(new ClientReceive(this, this.socket));
 		threadClientSend.start();
 		threadClientReceive.start();
@@ -57,14 +58,14 @@ public class Client {
 		}
 	}
 	
-	
-	/*public int GetId()
+	public Thread GeTthreadClientSend()
 	{
-		return this.id;
+		return this.threadClientSend;
 	}
 	
-	public void SetId(int unId)
+	public ClientSend GetLeClientSend()
 	{
-		this.id = unId;
-	} */
+		return this.leClientSend;
+	}
+	
 }

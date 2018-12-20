@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.util.concurrent.TimeUnit;
 
 import Morpion.Controller.Reseau.Common.Message;
+import Morpion.FrontEnd.ClientPanel;
 
 public class ClientReceive implements Runnable {
 
@@ -49,7 +50,8 @@ public class ClientReceive implements Runnable {
 				if (mess != null) 
 				{
 					System.out.println("\nMessage reçu : " + mess.GetContent());
-					//this.client.messageReceived(mess);
+					// existe pas this.client.messageReceived(mess);
+					Morpion.FrontEnd.ClientPanel.AjouterMess(mess.GetContent());
 				} 
 				else
 				{

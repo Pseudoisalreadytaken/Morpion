@@ -4,21 +4,18 @@ import java.io.IOException;
 
 public class MainServer {
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 
-		
-		
-		
+
+	public MainServer(String unPort) {		
 		try 
 		{
-			if (args.length != 1)
+			if (unPort == "")
 			{
 				printUsage();
 			} 
 			else 
 			{
-				Integer port = new Integer(args[0]);
+				Integer port = new Integer(unPort);
 				Server server = new Server(port);
 			}
 			System.out.println("JA !");
@@ -26,11 +23,11 @@ public class MainServer {
 		catch (Exception e)
 		{
 			System.out.println(e.getMessage());
-		}					
-	
+		}			
 	}
+	
 		
-	private static void printUsage() 
+	private void printUsage() 
 	{
 		System.out.println("java server.Server <port>");
 		System.out.println("\t<port>: server's port");

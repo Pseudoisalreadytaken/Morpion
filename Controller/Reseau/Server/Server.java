@@ -37,10 +37,7 @@ public class Server {
 	{
 		for (ConnectedClient client : clients) 
 		{
-			if (client.GetId() != id) 
-			{
-				client.sendMessage(mess);
-			}
+			client.sendMessage(mess);
 		}
 	}
 	
