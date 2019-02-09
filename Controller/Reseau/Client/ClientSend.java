@@ -37,7 +37,7 @@ public class ClientSend implements Runnable {
 			{
 				//on attend 1 seconde
 				try {
-				TimeUnit.SECONDS.sleep(1);
+				TimeUnit.MILLISECONDS.sleep(400);
 				}
 				catch (Exception e)
 				{
