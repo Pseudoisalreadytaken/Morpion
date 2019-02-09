@@ -17,33 +17,25 @@ public class ClientSend implements Runnable {
 	
 	private boolean attenteMess = false;
 	private String unMessageAEnvouer = "";
+	private String senderDuMessAEnvoyer = "Client";
 	
 	public ClientSend(Socket unSocket, ObjectOutputStream unOut, String unPseudo)
 	{
 		this.socket = unSocket;
 		this.out = unOut;
 		this.pseudo = unPseudo;
-		/*try
-		{
-			this.out = new ObjectOutputStream(this.socket.getOutputStream());
-		}
-		catch (Exception e)
-		{
-			System.out.println(e.getMessage());
-		}*/
 	}
 	
 	//invite l’utilisateur à saisir un message, et l’envoie :
 	public void run()
 	{
 		Scanner sc = new Scanner(System.in);
-		while (true) 
+		while (!Thread.interrupted()) 
 		{
-			System.out.print("Votre message >> ");
 			//On attend un message
 			while(attenteMess == false)
 			{
-				System.out.println("nop");
+				//on attend 1 seconde
 				try {
 				TimeUnit.SECONDS.sleep(1);
 				}
@@ -52,15 +44,15 @@ public class ClientSend implements Runnable {
 					System.out.println(e.getMessage());
 				}
 			}
-			System.out.println("Message détecter");
+			//Message détecter
 			attenteMess = false;
-			//Création du message
-			String m = pseudo + " : " + this.unMessageAEnvouer;
+			//Création du texte du message
+			String m = pseudo + " " + this.unMessageAEnvouer;
 			//Reset du champ message a envoyer
 			this.unMessageAEnvouer = "";
-			System.out.println(m);
 			
-			Message mess = new Message("client", m);
+			//Création de l'objet Message avec le message a envoyer
+			Message mess = new Message(senderDuMessAEnvoyer, m, this.pseudo);
 			try
 			{
 				out.writeObject(mess);
@@ -74,12 +66,16 @@ public class ClientSend implements Runnable {
 		}
 	}
 	
-	public void ButtonSendPushed(boolean unBoolean) {
+	public void EnvoyerLeMessage(boolean unBoolean) {
 		this.attenteMess = unBoolean;
 	}
 	
-	public void GetMessAEnvoyer(String unMessage) {
+	public void SetMessAEnvoyer(String unMessage) {
 		this.unMessageAEnvouer = unMessage;
+	}
+	
+	public void SetSenderDuMessAEnvoyer(String leSender) {
+		this.senderDuMessAEnvoyer = leSender;
 	}
 	
 	public boolean GetAttenteMess()

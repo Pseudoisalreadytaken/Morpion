@@ -21,19 +21,13 @@ public class Server {
 	
 	
 	public void addClient(ConnectedClient newClient)
-	{
-		//envoie d’abord un message à tous les clients pour annoncer la nouvelle connexion :
-		for (ConnectedClient client : clients) 
-		{
-			client.sendMessage2("Le client "+newClient.GetId()+" vient de se connecter");
-		}
-		
+	{	
 		//ajoute le client connecté, passé en paramètre, à notre liste clients :
 		this.clients.add(newClient);			
 	}
 	
-	//envoie le message mess à tous les clients sauf celui dont l’identifiant est id
-	public void broadcastMessage(Message mess, int id)
+	//envoie le message mess à tous les clients
+	public void broadcastMessage(Message mess)
 	{
 		for (ConnectedClient client : clients) 
 		{
@@ -41,17 +35,23 @@ public class Server {
 		}
 	}
 	
-	
-	//appeler la méthode closeClient() du client qui se déconnecte, le supprimer de la liste clients, 
-	//et enfin prévenir les clients restants que discClient vient de se déconnecter, en leur envoyant un message :
 	public void disconnectedClient(ConnectedClient discClient)
 	{
+		discClient.closeClient();
+		//supprime le client de la liste des client
+		this.clients.remove(discClient);
+	}
+	
+	public void disconnectedAllClient()
+	{
+		//Pour chaque clients
 		for (ConnectedClient client : clients) 
 		{
-			client.sendMessage(new Message("server", "Le client " +
-			discClient.GetId() + " nous a quitté"));
+			client.closeClient();
+			//supprime le client de la liste des client
 		}
 	}
+	
 	
 	public int GetPort()
 	{

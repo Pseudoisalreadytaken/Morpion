@@ -44,7 +44,6 @@ public class ConnectedClient implements Runnable {
 		{
 			//créer l'objet in à partir du socket :
 			this.in = new ObjectInputStream(socket.getInputStream());
-			System.out.println("cbn");
 		}
 		catch (Exception e)
 		{
@@ -57,25 +56,15 @@ public class ConnectedClient implements Runnable {
 		{
 			try
 			{
-				System.out.println("ok0");
 				//On attend un nouveau message grâce à l’attribut in :
 				Message mess = (Message) in.readObject();
-				System.out.println("ok1");
-				//Si le message n'est pas null
-				if (mess != null)
-				{
-					mess.SetSender(String.valueOf(id));
-					System.out.println("ok2");
-					server.broadcastMessage(mess, id);
-					System.out.println("ok3");
-				}
-				//Si le message est null, alors on indique au serveur que le client courant vient de
+				//Une fois un message recu, on l'envoie a tous le monde
+				server.broadcastMessage(mess);
+				
+				//Si le message vien d'un client déconnecter, alors on indique au serveur que le client courant vient de
 				//se déconnecter, et on met fin à la boucle while :
-				else
+				if (mess.GetSender().equals("ClientDeconnecter"))
 				{
-					System.out.println("ok4");
-					server.disconnectedClient(this);
-					System.out.println("ok5");
 					isActive = false;
 				}
 			}
@@ -84,6 +73,7 @@ public class ConnectedClient implements Runnable {
 				System.out.println(e.getMessage());
 			}
 			
+			//On attend 1 seconde
 			try
 			{
 				TimeUnit.SECONDS.sleep(1);
@@ -94,16 +84,17 @@ public class ConnectedClient implements Runnable {
 			}
 			
 		}
+		server.disconnectedClient(this);
 	}
 	
-	//envoie le message au client en utilisant out :
+	//envoie le message aux clients en utilisant out :
 	public void sendMessage(Message m)
 	{
 		try
 		{
-			System.out.println("hi");
 			this.out.writeObject(m);
 			this.out.flush();
+			
 		}
 		catch (Exception e)
 		{
@@ -111,19 +102,6 @@ public class ConnectedClient implements Runnable {
 		}
 	}
 	
-	//envoie le message au client en utilisant out :
-		public void sendMessage2(String m)
-		{
-			try
-			{
-				this.out.writeObject(m);
-				this.out.flush();
-			}
-			catch (Exception e)
-			{
-				System.out.println(e.getMessage());
-			}
-		}
 	
 	//ferme les deux flux in et out, ainsi que le socket :
 	public void closeClient()

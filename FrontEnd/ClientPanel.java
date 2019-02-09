@@ -4,12 +4,15 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.paint.Color;
 import javafx.scene.text.TextFlow;
 import javafx.embed.swing.JFXPanel;
 
@@ -56,10 +59,13 @@ public class ClientPanel extends Parent {
 	static private TextFlow receivedText;
 	private Button sendBtn;
 	
-	private MainClient unClient;
+	private MainClient unMainClient;
+	
+	private boolean estServeur = false;
+	
 	
 	//static public boolean attenteMessClient = false;
-	public ClientPanel() {
+	public ClientPanel() {	
 		
 		//Section connexion
 		this.btnSinscrire = new Button();
@@ -436,34 +442,61 @@ public class ClientPanel extends Parent {
 			@Override
 			public void handle(ActionEvent event) 
 			{
-				//Création du serveur	
-				MainServer unServ =	new MainServer(textPortCreationServeur.getText());
-				
-				try {
-					TimeUnit.SECONDS.sleep(2);
+				//Vérification de la donnée entré en numéro de port				
+				if (textPortCreationServeur.getText().matches("[0-9]+"))
+				{
+					// Parse en nombre le port
+					int numeroDuPortNouveauServ = Integer.parseInt(textPortCreationServeur.getText());
+					if (numeroDuPortNouveauServ >= 2000 && numeroDuPortNouveauServ <= 2100)
+					{
+						estServeur = true;
+						//Création du serveur	
+						MainServer unServ =	new MainServer(textPortCreationServeur.getText());
+						
+						try {
+							TimeUnit.SECONDS.sleep(2);
+						}
+						catch (Exception e){
+							System.out.println(e.getMessage());
+						}
+						
+						//Création du client
+						unMainClient = new MainClient("127.0.0.1", textPortCreationServeur.getText(), "[HOST] " + pseudoDuJoueur);
+						
+						//Suppresion des élément plus utile	
+						getChildren().remove(labelCreeServeurSection);
+						getChildren().remove(labelPortCreationServeur);
+						getChildren().remove(textPortCreationServeur);
+						getChildren().remove(btnNouveauServeur);
+						getChildren().remove(labelRejoindreServeurSection);
+						getChildren().remove(labelPortRejoindreServeur);
+						getChildren().remove(textPortRejoindreServeur);
+						getChildren().remove(btnRejoindreServeur);
+						
+						//Ajout des élément utile
+						getChildren().add(scrollReceivedText);
+						getChildren().add(textToSend);
+						getChildren().add(sendBtn);
+					}
+					else
+					{
+						//Alerte l'utilisateur qu'il n'a pas entrer un chiffre disponible en port
+						Alert alertPortMauvaisNombre = new Alert(AlertType.INFORMATION);
+						alertPortMauvaisNombre.setTitle("Mauvais port");
+						alertPortMauvaisNombre.setHeaderText("Le port doit être un nombre entier entre 2000 et 2100");
+						alertPortMauvaisNombre.setContentText("Merci d'entrer un nombre entre 2000 et 2100 comme port du serveur");
+						alertPortMauvaisNombre.showAndWait();
+					}
 				}
-				catch (Exception e){
-					System.out.println(e.getMessage());
-				}
-				
-				//Création du client
-				unClient = new MainClient("127.0.0.1", textPortCreationServeur.getText(), pseudoDuJoueur);
-				
-				//Suppresion des élément plus utile	
-				getChildren().remove(labelCreeServeurSection);
-				getChildren().remove(labelPortCreationServeur);
-				getChildren().remove(textPortCreationServeur);
-				getChildren().remove(btnNouveauServeur);
-				getChildren().remove(labelRejoindreServeurSection);
-				getChildren().remove(labelPortRejoindreServeur);
-				getChildren().remove(textPortRejoindreServeur);
-				getChildren().remove(btnRejoindreServeur);
-				
-				//Ajout des élément utile
-				getChildren().add(scrollReceivedText);
-				getChildren().add(textToSend);
-				getChildren().add(sendBtn);
-				
+				else
+				{
+					//Alerte l'utilisateur qu'il n'a pas entré un chiffre dans le champ port
+					Alert alertPortPasNombre = new Alert(AlertType.INFORMATION);
+					alertPortPasNombre.setTitle("Mauvais port");
+					alertPortPasNombre.setHeaderText("Le port saisi n'est pas un nombre entier");
+					alertPortPasNombre.setContentText("Merci d'entrer un nombre entier comme port du serveur");
+					alertPortPasNombre.showAndWait();
+				}			
 			}
 		});
 		
@@ -471,24 +504,51 @@ public class ClientPanel extends Parent {
 		{
 			@Override
 			public void handle(ActionEvent event) 
-			{
-				//Création du client
-				unClient = new MainClient("127.0.0.1", textPortRejoindreServeur.getText(), pseudoDuJoueur);
-				
-				//Suppresion des élément plus utile	
-				getChildren().remove(labelCreeServeurSection);
-				getChildren().remove(labelPortCreationServeur);
-				getChildren().remove(textPortCreationServeur);
-				getChildren().remove(btnNouveauServeur);
-				getChildren().remove(labelRejoindreServeurSection);
-				getChildren().remove(labelPortRejoindreServeur);
-				getChildren().remove(textPortRejoindreServeur);
-				getChildren().remove(btnRejoindreServeur);
-				
-				//Ajout des élément utile
-				getChildren().add(scrollReceivedText);
-				getChildren().add(textToSend);
-				getChildren().add(sendBtn);		
+			{		
+				//Vérification de la donnée entré en numéro de port				
+				if (textPortRejoindreServeur.getText().matches("[0-9]+"))
+				{
+					// Parse en nombre le port
+					int numeroDuPortRejoindreServ = Integer.parseInt(textPortRejoindreServeur.getText());
+					if (numeroDuPortRejoindreServ >= 2000 && numeroDuPortRejoindreServ <= 2100)
+					{
+						//Création du client
+						unMainClient = new MainClient("127.0.0.1", textPortRejoindreServeur.getText(), pseudoDuJoueur);
+						
+						//Suppresion des élément plus utile	
+						getChildren().remove(labelCreeServeurSection);
+						getChildren().remove(labelPortCreationServeur);
+						getChildren().remove(textPortCreationServeur);
+						getChildren().remove(btnNouveauServeur);
+						getChildren().remove(labelRejoindreServeurSection);
+						getChildren().remove(labelPortRejoindreServeur);
+						getChildren().remove(textPortRejoindreServeur);
+						getChildren().remove(btnRejoindreServeur);
+						
+						//Ajout des élément utile
+						getChildren().add(scrollReceivedText);
+						getChildren().add(textToSend);
+						getChildren().add(sendBtn);		
+					}
+					else
+					{
+						//Alerte l'utilisateur qu'il n'a pas entrer un chiffre disponible en port
+						Alert alertPortMauvaisNombre = new Alert(AlertType.INFORMATION);
+						alertPortMauvaisNombre.setTitle("Mauvais port");
+						alertPortMauvaisNombre.setHeaderText("Le port doit être un nombre entier entre 2000 et 2100");
+						alertPortMauvaisNombre.setContentText("Merci d'entrer un nombre entre 2000 et 2100 comme port du serveur");
+						alertPortMauvaisNombre.showAndWait();
+					}
+				}
+				else
+				{
+					//Alerte l'utilisateur qu'il n'a pas entré un chiffre dans le champ port
+					Alert alertPortPasNombre = new Alert(AlertType.INFORMATION);
+					alertPortPasNombre.setTitle("Mauvais port");
+					alertPortPasNombre.setHeaderText("Le port saisi n'est pas un nombre entier");
+					alertPortPasNombre.setContentText("Merci d'entrer un nombre entier comme port du serveur");
+					alertPortPasNombre.showAndWait();
+				}			
 			}
 		});
 			
@@ -498,14 +558,13 @@ public class ClientPanel extends Parent {
 			@Override
 			public void handle(ActionEvent event) 
 			{
-				unClient.GetClient().GetLeClientSend().GetMessAEnvoyer(textToSend.getText());
-				unClient.GetClient().GetLeClientSend().ButtonSendPushed(true);
-
-				System.out.println(unClient.GetClient().GetLeClientSend().GetAttenteMess());
+				unMainClient.GetClient().GetLeClientSend().SetMessAEnvoyer(": " + textToSend.getText());
+				unMainClient.GetClient().GetLeClientSend().EnvoyerLeMessage(true);
 				
 				textToSend.setText("");
 			}
 		});
+		
 
 	}
 	
@@ -515,7 +574,7 @@ public class ClientPanel extends Parent {
 	//
 	//Les METHODE
 	//
-	public static void AjouterMess(String leMess){	
+	public static void AjouterMess(String leMess, String leSender){	
 		Platform.runLater(new Runnable() {
 		    @Override
 		    public void run() {
@@ -526,9 +585,36 @@ public class ClientPanel extends Parent {
 				messageAEnvoye.setPrefWidth(398);		
 				//Le label prend la valeur érite
 				messageAEnvoye.setText(leMess);
+				
+				if (leSender.equals("ClientDeconnecter"))
+				{
+					messageAEnvoye.setTextFill(Color.web("#e74c3c"));
+				}
+				
+				if (leSender.equals("nouveauClient"))
+				{
+					messageAEnvoye.setTextFill(Color.web("#0abde3"));
+				}
+				
+				if (leSender.equals("ServeurDeconnecter"))
+				{
+					messageAEnvoye.setTextFill(Color.web("#e74c3c"));
+					messageAEnvoye.setText(leMess + "\n\nL'HOST est parti\nDeconnexion...");
+					receivedText.getChildren().add(messageAEnvoye);
+					
+					//Alerte l'utilisateur qu'il va être déconnecter
+					Alert alertDeconnexionHote = new Alert(AlertType.INFORMATION);
+					alertDeconnexionHote.setTitle("L'hôte est parti");
+					alertDeconnexionHote.setHeaderText("L'hôte du serveur s'est déconnecté");
+					alertDeconnexionHote.setContentText("Vous allez être déconnecté");
+					alertDeconnexionHote.showAndWait();		
+					System.exit(0);
+				}
 							
 				
-				receivedText.getChildren().add(messageAEnvoye);		
+			receivedText.getChildren().add(messageAEnvoye);		
+				
+				
 		    }
 		});			
 		
@@ -550,6 +636,14 @@ public class ClientPanel extends Parent {
 	public Button GetSendBtn()
 	{
 		return this.sendBtn;
+	}
+	
+	public MainClient getLeMainClient() {
+		return this.unMainClient;
+	}
+	
+	public boolean GetEstServeur() {
+		return this.estServeur;
 	}
 
 }

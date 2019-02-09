@@ -30,10 +30,6 @@ public class Connection implements Runnable {
 		{
 			try
 			{
-				//création d’un SocketServeur pour écouter les nouvelles connexions :
-				//int port = 2000;
-				//ServerSocket servSocket = new ServerSocket(port);
-				//On attent une connexion
 				sockNewClient = serverSocket.accept();
 			}
 			catch (Exception e)

@@ -12,13 +12,15 @@ public class ClientReceive implements Runnable {
 
 	public Client client;
 	public Socket socket;
+	private String pseudo;
 	private ObjectInputStream in;
 
 	
-	public ClientReceive(Client unClient, Socket unSocket)
+	public ClientReceive(Client unClient, Socket unSocket, String unPseudo)
 	{
 		this.client = unClient;
 		this.socket = unSocket;
+		this.pseudo = unPseudo;
 	}
 	
 	
@@ -37,26 +39,18 @@ public class ClientReceive implements Runnable {
 		}
 		
 		//Attend un nouveau message à l'aide de in tant que la connexion est active. Si le
-		//message reçu n’est pas null, on l’affiche sur la sortie standard. Si le message reçu est null, la
+		//message reçu ne vien pas d'un client déconnecter, on l’affiche sur la sortie standard. Si le message reçu vien d'un client déconnecter, la
 		//connexion devient inactive, et on appelle la méthode disconnectedServer() de l’attribut client
 		//
 		Message mess;
-		boolean isActive = true ;
-		while(isActive)
+		while(!Thread.interrupted())
 		{
 			try
 			{
+				//On attend un message
 				mess = (Message) in.readObject();
-				if (mess != null) 
-				{
-					System.out.println("\nMessage reçu : " + mess.GetContent());
-					// existe pas this.client.messageReceived(mess);
-					Morpion.FrontEnd.ClientPanel.AjouterMess(mess.GetContent());
-				} 
-				else
-				{
-					isActive = false;
-				}
+				//On ajoute le messsage sur le FrontEnd
+				Morpion.FrontEnd.ClientPanel.AjouterMess(mess.GetContent(), mess.GetSender());
 			}
 			catch (Exception e)
 			{
@@ -64,7 +58,6 @@ public class ClientReceive implements Runnable {
 			}
 			
 		} 
-		client.disconnectedServer();
 	}
 	
 }

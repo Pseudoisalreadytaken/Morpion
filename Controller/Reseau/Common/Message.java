@@ -6,16 +6,13 @@ public class Message implements Serializable{
 	
 	private String sender;
 	private String content;
+	private String pseudoDuSender;
 	
-	public Message (String unSender, String unContent)
+	public Message (String unSender, String unContent, String unPseudoDuSender)
 	{
 		this.sender = unSender;
 		this.content = unContent;
-	}
-	
-	public String toString()
-	{
-		return "Ce message a pour sener : " + this.sender + " et pour content : " + this.content;
+		this.pseudoDuSender = unPseudoDuSender;
 	}
 	
 	public String GetContent()
@@ -23,8 +20,18 @@ public class Message implements Serializable{
 		return this.content;
 	}
 	
+	public String GetSender()
+	{
+		return this.sender;
+	}
+	
 	public void SetSender(String unSender)
 	{
 		this.sender = unSender;
+	}
+	
+	public String GetPseudoDuSender()
+	{
+		return this.pseudoDuSender;
 	}
 }

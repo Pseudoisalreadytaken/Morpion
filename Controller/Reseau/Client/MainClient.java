@@ -13,29 +13,17 @@ public class MainClient {
 		this.pseudo = unPseudo;
 		try
 		{
-			if (uneAdresse == "") 
-			{
-				printUsage();
-			} 
-			else 
-			{
-				String address = uneAdresse;
-				Integer port = new Integer(unPort);
-				String pseudo = unPseudo;
-				this.leClient = new Client(address, port, pseudo);
-			}
+			String address = uneAdresse;
+			Integer port = new Integer(unPort);
+			String pseudo = unPseudo;
+			this.leClient = new Client(address, port, pseudo);
 		}
 		catch (Exception e)
 		{
 			System.out.println(e.getMessage());
 		}	
-		System.out.println("JA !");
-	}
-	
-	private void printUsage() {
-		System.out.println("java client.Client <address> <port>");
-		System.out.println("\t<address>: server's ip address");
-		System.out.println("\t<port>: server's port");
+		//Création client réussi
+		System.out.println("Client" + pseudo + " crée\tadresse : " + uneAdresse + "\tport : " + unPort);
 	}
 	
 	public Client GetClient() {
