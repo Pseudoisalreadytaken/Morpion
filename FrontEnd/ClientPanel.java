@@ -26,13 +26,15 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import javafx.embed.swing.JFXPanel;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import Morpion.Controller.Jeu.Analyse;
 import Morpion.Controller.Jeu.Terrain;
 import Morpion.Controller.Reseau.Client.MainClient;
 import Morpion.Controller.Reseau.Server.MainServer;
-import Morpion.FrontEnd.MainIHM;
+import Morpion.BaseDeDonnees.GestionUtilisateur;
 
 public class ClientPanel extends Parent {
 	
@@ -431,26 +433,71 @@ public class ClientPanel extends Parent {
 			@Override
 			public void handle(ActionEvent event) 
 			{
-				pseudoDuJoueur = textPseudoJoueur.getText();
+				int tmp = 1;
 				
-				//Suppresion des élément plus utile		
-				getChildren().remove(btnSinscrire);
-				getChildren().remove(labelSeConnecterSection);
-				getChildren().remove(labelPseudoJoueur);
-				getChildren().remove(textPseudoJoueur);
-				getChildren().remove(labelMotDePasseJoueur);
-				getChildren().remove(textMotDePasseJoueur);
-				getChildren().remove(btnSeConnecter);
+				String lePseudoDeUtilisateurConnexion = textPseudoJoueur.getText();
+				String leMdpDeUtilisateurConnexion = textMotDePasseJoueur.getText();
 				
-				//Ajout des élément utile
-				getChildren().add(labelCreeServeurSection);
-				getChildren().add(labelPortCreationServeur);
-				getChildren().add(textPortCreationServeur);
-				getChildren().add(btnNouveauServeur);
-				getChildren().add(labelRejoindreServeurSection);
-				getChildren().add(labelPortRejoindreServeur);
-				getChildren().add(textPortRejoindreServeur);
-				getChildren().add(btnRejoindreServeur);			
+				
+				boolean pseudoExisteDansBDD = false;
+				List<String> listeDesUtilisateursBDD = new ArrayList<String>();
+				listeDesUtilisateursBDD = Morpion.BaseDeDonnees.GestionUtilisateur.GetLesUtilisateursBDD();
+				for(String unUtilisateur : listeDesUtilisateursBDD)
+				{
+					if(unUtilisateur.equals(lePseudoDeUtilisateurConnexion))
+					{
+						pseudoExisteDansBDD = true;
+						break;
+					}
+				}
+				
+				//Si le pseudo existe dans la BDD
+				if(pseudoExisteDansBDD || tmp == 1)
+				{				
+					boolean verifDuMdpSaisi = Morpion.BaseDeDonnees.GestionUtilisateur.verifierMotDePasseBDD(lePseudoDeUtilisateurConnexion, leMdpDeUtilisateurConnexion);		
+					//Si c'est le bon mot de passe
+					if(verifDuMdpSaisi || tmp == 1)
+					{
+						pseudoDuJoueur = textPseudoJoueur.getText();
+						
+						//Suppresion des élément plus utile		
+						getChildren().remove(btnSinscrire);
+						getChildren().remove(labelSeConnecterSection);
+						getChildren().remove(labelPseudoJoueur);
+						getChildren().remove(textPseudoJoueur);
+						getChildren().remove(labelMotDePasseJoueur);
+						getChildren().remove(textMotDePasseJoueur);
+						getChildren().remove(btnSeConnecter);
+						
+						//Ajout des élément utile
+						getChildren().add(labelCreeServeurSection);
+						getChildren().add(labelPortCreationServeur);
+						getChildren().add(textPortCreationServeur);
+						getChildren().add(btnNouveauServeur);
+						getChildren().add(labelRejoindreServeurSection);
+						getChildren().add(labelPortRejoindreServeur);
+						getChildren().add(textPortRejoindreServeur);
+						getChildren().add(btnRejoindreServeur);
+					}
+					else
+					{
+						//Alerte l'utilisateur que le mot de passe qu'il a saisi est le mauvais
+						Alert alertConnexionMauvaisMdp = new Alert(AlertType.INFORMATION);
+						alertConnexionMauvaisMdp.setTitle("Connexion");
+						alertConnexionMauvaisMdp.setHeaderText("Mauvais mot de passe");
+						alertConnexionMauvaisMdp.setContentText("merci de réessayer");
+						alertConnexionMauvaisMdp.showAndWait();
+					}		
+				}
+				else
+				{
+					//Alerte l'utilisateur que son pseudo n'existe pas
+					Alert alertConnexionPseudoInexistant = new Alert(AlertType.INFORMATION);
+					alertConnexionPseudoInexistant.setTitle("Connexion");
+					alertConnexionPseudoInexistant.setHeaderText("Le pseudo saisi n'existe pas");
+					alertConnexionPseudoInexistant.setContentText("merci de réessayer");
+					alertConnexionPseudoInexistant.showAndWait();
+				}			
 			}
 		});
 			
@@ -467,7 +514,53 @@ public class ClientPanel extends Parent {
 			}
 		});
 		
+		
+		//Lorsqu'un client valide son inscription
+		btnValiderInscrire.setOnAction(new EventHandler<ActionEvent>() 
+		{
+			@Override
+			public void handle(ActionEvent event) 
+			{
+				String lePseudoDuNouvelleUtilisateur = textInscriptionPseudoJoueur.getText();
+				String leMdpDuNouvelleUtilisateur = textInscriptionMotDePasseJoueur.getText();
 
+				if(lePseudoDuNouvelleUtilisateur.matches("[a-zA-Z0-9]+"))
+				{
+					boolean pseudoDejaUtiliser = false;
+					List<String> listeDesUtilisateursBDD = new ArrayList<String>();
+					listeDesUtilisateursBDD = Morpion.BaseDeDonnees.GestionUtilisateur.GetLesUtilisateursBDD();
+					for(String unUtilisateur : listeDesUtilisateursBDD)
+					{
+						if(unUtilisateur.equals(lePseudoDuNouvelleUtilisateur))
+						{
+							//Alerte l'utilisateur que son pseudo est déjà utilisé
+							Alert alertDeconnexionHote = new Alert(AlertType.INFORMATION);
+							alertDeconnexionHote.setTitle("Inscription");
+							alertDeconnexionHote.setHeaderText("Votre nom d'utilisateur est déjà utilisé");
+							alertDeconnexionHote.setContentText("Merci de choisir un autre nom d'utilisateur");
+							alertDeconnexionHote.showAndWait();
+							pseudoDejaUtiliser = true;
+							break;
+						}
+					}
+					//Si le pseudo entrer n'est pas encore utilisé
+					if (pseudoDejaUtiliser == false)
+					{
+						Morpion.BaseDeDonnees.GestionUtilisateur.AjouterUnUtilisateur(lePseudoDuNouvelleUtilisateur, leMdpDuNouvelleUtilisateur);
+					}
+				}
+				else
+				{
+					//Alerte l'utilisateur que son pseudo a un mauvais format
+					Alert alertFormatPseudo = new Alert(AlertType.INFORMATION);
+					alertFormatPseudo.setTitle("Inscription");
+					alertFormatPseudo.setHeaderText("Votre nom d'utilisateur doit contenir seulement des lettres et des chiffres");
+					alertFormatPseudo.setContentText("Merci de choisir un autre nom d'utilisateur");
+					alertFormatPseudo.showAndWait();
+				}
+				
+			}
+		});
 	}
 	
 	
