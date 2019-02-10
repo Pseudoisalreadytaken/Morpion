@@ -17,7 +17,7 @@ public class Analyse {
 		valide[i] = true;
 	}
 	
-	public void Verifier() {
+	public boolean Verifier() {
 		boolean v = false;
 		if (valide[0] && valide[4] && valide[8] ) 
 		{
@@ -40,10 +40,6 @@ public class Analyse {
 				 v = true;
 			}			
 		}
-		if (v) {
-			Alert alert = new Alert(AlertType.CONFIRMATION);
-	        alert.setContentText(this.type +" a gagngé !");
-	        alert.show();
-		}
+		return v;
 	}
 }

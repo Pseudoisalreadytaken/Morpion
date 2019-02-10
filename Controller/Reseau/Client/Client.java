@@ -19,12 +19,15 @@ public class Client {
 	private ObjectInputStream in;
 	private ObjectOutputStream out;
 	
+	private Socket socketClick;
+	private ObjectInputStream inClick;
+	private ObjectOutputStream outClick;
+	
 	private Thread threadClientSend;
 	private Thread threadClientReceive;
 	private ClientSend leClientSend;
 	private ClientReceive leClientReceive;
-
-
+	
 	public Client(String uneAdresse, int unPort, String unPseudo)
 	{
 		this.address = uneAdresse;
@@ -35,6 +38,8 @@ public class Client {
 		{			
 			this.socket = new Socket(this.address, this.port);
 			this.out = new ObjectOutputStream(this.socket.getOutputStream());
+			this.socketClick = new Socket(this.address, this.port);
+			this.outClick = new ObjectOutputStream(this.socketClick.getOutputStream());
 		}
 		catch (Exception e)
 		{

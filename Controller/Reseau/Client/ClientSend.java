@@ -18,6 +18,11 @@ public class ClientSend implements Runnable {
 	private boolean attenteMess = false;
 	private String unMessageAEnvouer = "";
 	private String senderDuMessAEnvoyer = "Client";
+	private double x1;
+	private double x2;
+	private double y1;
+	private double y2;
+	private boolean win = false;
 	
 	public ClientSend(Socket unSocket, ObjectOutputStream unOut, String unPseudo)
 	{
@@ -53,6 +58,11 @@ public class ClientSend implements Runnable {
 			
 			//Création de l'objet Message avec le message a envoyer
 			Message mess = new Message(senderDuMessAEnvoyer, m, this.pseudo);
+			mess.SetX1(x1);
+			mess.SetX2(x2);
+			mess.SetY1(y1);
+			mess.SetY2(y2);
+			mess.SetWin(win);
 			try
 			{
 				out.writeObject(mess);
@@ -81,6 +91,21 @@ public class ClientSend implements Runnable {
 	public boolean GetAttenteMess()
 	{
 		return this.attenteMess;
+	}
+	public void SetX1(double x1) {
+		this.x1 = x1;
+	}
+	public void SetX2(double x2) {
+		this.x2 = x2;
+	}
+	public void SetY1(double y1) {
+		this.y1 = y1;
+	}
+	public void SetY2(double y2) {
+		this.y2 = y2;
+	}
+	public void SetWin(boolean win) {
+		this.win = win;
 	}
 
 }

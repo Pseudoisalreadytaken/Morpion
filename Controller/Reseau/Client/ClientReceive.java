@@ -4,8 +4,14 @@ import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.util.concurrent.TimeUnit;
 
+
 import Morpion.Controller.Reseau.Common.Message;
 import Morpion.FrontEnd.ClientPanel;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 
 public class ClientReceive implements Runnable {
 
@@ -51,12 +57,31 @@ public class ClientReceive implements Runnable {
 				mess = (Message) in.readObject();
 				//On ajoute le messsage sur le FrontEnd
 				Morpion.FrontEnd.ClientPanel.AjouterMess(mess.GetContent(), mess.GetSender());
+				System.out.println(pseudo);				
+				if(mess.GetX1() != 0 && mess.GetX2() != 0) 
+				{
+					Morpion.FrontEnd.ClientPanel.AjouterCroix(mess.GetX1(), mess.GetX2(), mess.GetY1(), mess.GetY2());
+				}	
+				else if(mess.GetX1() != 0 && mess.GetX2() == 0)
+				{
+					Morpion.FrontEnd.ClientPanel.AjouterRond(mess.GetX1(), mess.GetY1());
+				}
+				if(mess.GetWin()) 
+				{
+					Platform.runLater(new Runnable() {
+					    @Override
+					    public void run() {
+							Alert alert = new Alert(AlertType.CONFIRMATION);
+					        alert.setContentText( " gagngé !");
+					        alert.show();
+					    }
+					});		
+				}
 			}
 			catch (Exception e)
 			{
 				System.out.println(e.getMessage());
 			}
-			
 		} 
 	}
 	

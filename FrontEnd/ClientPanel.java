@@ -73,6 +73,7 @@ public class ClientPanel extends Parent {
 	private Button btnRejoindreServeur;
 	
 	//Section CHAT
+	static private Pane pane;
 	private TextArea textToSend;
 	private ScrollPane scrollReceivedText;
 	static private TextFlow receivedText;
@@ -115,6 +116,7 @@ public class ClientPanel extends Parent {
 		this.btnRejoindreServeur = new Button();
 		
 		//Section CHAT
+		this.pane = new Pane();
 		this.textToSend = new TextArea();
 		this.scrollReceivedText = new ScrollPane();
 		this.receivedText = new TextFlow();
@@ -342,6 +344,11 @@ public class ClientPanel extends Parent {
 		//
 		//Section CHAT
 		//	
+		pane.setLayoutX(0);
+		pane.setLayoutY(0);
+		pane.setPrefWidth(600);
+		pane.setPrefHeight(600);
+		
 		scrollReceivedText.setLayoutX(650);
 		scrollReceivedText.setLayoutY(25);
 		scrollReceivedText.setPrefWidth(400);
@@ -570,6 +577,46 @@ public class ClientPanel extends Parent {
 	//Les METHODE
 	//
 	
+	//
+	//Dessine une croix sur le morpion de l'adeversaire
+	//
+	public static void AjouterCroix(double x1, double x2, double y1, double y2) 
+	{
+		Platform.runLater(new Runnable() {
+		    @Override
+		    public void run() {
+		    	Line line1 = new Line(x1,y1,x2,y2);
+				line1.setStroke(Color.DEEPPINK); 
+				line1.setStrokeWidth(20);
+				pane.getChildren().add(line1);
+				Line line2 = new Line(x1,y2,x2,y1);
+				line2.setStroke(Color.DEEPPINK); 
+				line2.setStrokeWidth(20);
+				pane.getChildren().add(line2);					
+		    }
+		});		
+	}
+	
+	//
+	//Dessine un rond sur le morpion de l'adeversaire
+	//
+	public static void AjouterRond(double x, double y) 
+	{
+		Platform.runLater(new Runnable() {
+		    @Override
+		    public void run() {
+		    	 double echelle = 70;
+				 javafx.scene.shape.Circle c = new Circle();
+			     c.setCenterX(x);
+			     c.setCenterY(y);
+			     c.setRadius(echelle);
+			     c.setStroke(Color.BLUE);
+			     c.setStrokeWidth(20);	
+			     pane.getChildren().add(c);
+		    }
+		});				
+	}
+	
 	//Ajouter un message sur le serveur connecter
 	public static void AjouterMess(String leMess, String leSender){	
 		Platform.runLater(new Runnable() {
@@ -641,7 +688,7 @@ public class ClientPanel extends Parent {
 				}
 				
 				//Création du client
-				unMainClient = new MainClient("127.0.0.1", textPortCreationServeur.getText(), "[HOST] " + pseudoDuJoueur);
+				unMainClient = new MainClient("127.0.0.1", textPortCreationServeur.getText(), "[HOST] " + pseudoDuJoueur,ax);
 				
 				//Suppresion des élément plus utile	
 				getChildren().remove(labelCreeServeurSection);
@@ -654,6 +701,7 @@ public class ClientPanel extends Parent {
 				getChildren().remove(btnRejoindreServeur);
 				
 				//Ajout des élément utile
+				getChildren().add(pane);
 				getChildren().add(scrollReceivedText);
 				getChildren().add(textToSend);
 				getChildren().add(sendBtn);
@@ -698,7 +746,7 @@ public class ClientPanel extends Parent {
 			if (numeroDuPortRejoindreServ >= 2000 && numeroDuPortRejoindreServ <= 2100)
 			{
 				//Création du client
-				unMainClient = new MainClient("127.0.0.1", textPortRejoindreServeur.getText(), pseudoDuJoueur);
+				unMainClient = new MainClient("127.0.0.1", textPortRejoindreServeur.getText(), pseudoDuJoueur,ao);
 				
 				//Suppresion des élément plus utile	
 				getChildren().remove(labelCreeServeurSection);
@@ -711,6 +759,7 @@ public class ClientPanel extends Parent {
 				getChildren().remove(btnRejoindreServeur);
 				
 				//Ajout des élément utile
+				getChildren().add(pane);
 				getChildren().add(scrollReceivedText);
 				getChildren().add(textToSend);
 				getChildren().add(sendBtn);
@@ -747,7 +796,7 @@ public class ClientPanel extends Parent {
 	public void ajoutMorpionAuFrontEnd()
 	{	
 		for (int i = 0; i < t.GetRectangle().length; i++) {
-	    	getChildren().add(t.GetRectangle()[i]);
+	    	pane.getChildren().add(t.GetRectangle()[i]);
 		}	
 	    setOnMouseClicked(event -> {
 			Point2D p = new Point2D(event.getX(),event.getY());
@@ -776,7 +825,18 @@ public class ClientPanel extends Parent {
 						 
 						// Ajout du clic pour la vérification
 						ax.Ajouter(i);
-				        ax.Verifier();
+						if(ax.Verifier())
+						{
+							 unMainClient.GetClient().GetLeClientSend().SetWin(true);
+						}
+				        
+				        //Gestion de l'affichage dans la partit adverse
+				        unMainClient.GetClient().GetLeClientSend().SetX1(x1);
+				    	unMainClient.GetClient().GetLeClientSend().SetX2(x2);
+				    	unMainClient.GetClient().GetLeClientSend().SetY1(y1);
+				    	unMainClient.GetClient().GetLeClientSend().SetY2(y2);
+				    	unMainClient.GetClient().GetLeClientSend().SetMessAEnvoyer(" a joué son tour !");
+				    	unMainClient.GetClient().GetLeClientSend().EnvoyerLeMessage(true);
 					}
 				}
                     return;
@@ -799,6 +859,13 @@ public class ClientPanel extends Parent {
 					     // Ajout du clic pour la vérification
 						 ao.Ajouter(i);
 				         ao.Verifier();
+				         
+				        //Gestion de l'affichage dans la partit adverse
+				         unMainClient.GetClient().GetLeClientSend().SetX1(x);
+				         unMainClient.GetClient().GetLeClientSend().SetX2(0);
+					     unMainClient.GetClient().GetLeClientSend().SetY1(y);
+					 	 unMainClient.GetClient().GetLeClientSend().SetMessAEnvoyer(" a joué son tour !");
+				    	 unMainClient.GetClient().GetLeClientSend().EnvoyerLeMessage(true);
 					}
 				}
                    return;

@@ -3,12 +3,14 @@ package Morpion.Controller.Reseau.Client;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
+import Morpion.Controller.Jeu.Analyse;
+
 public class MainClient {
 
 	private Client leClient;
 	private String pseudo;
 		
-	public MainClient(String uneAdresse, String unPort, String unPseudo)
+	public MainClient(String uneAdresse, String unPort, String unPseudo,Analyse uneAnalyse)
 	{
 		this.pseudo = unPseudo;
 		try
