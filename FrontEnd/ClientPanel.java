@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 import Morpion.Controller.Jeu.Analyse;
 import Morpion.Controller.Jeu.Terrain;
 import Morpion.Controller.Reseau.Client.MainClient;
+import Morpion.Controller.Reseau.Common.Message;
 import Morpion.Controller.Reseau.Server.MainServer;
 import Morpion.BaseDeDonnees.GestionUtilisateur;
 
@@ -78,10 +79,12 @@ public class ClientPanel extends Parent {
 	private ScrollPane scrollReceivedText;
 	static private TextFlow receivedText;
 	private Button sendBtn;
+	private Button rejoindrePartie;
 	
 	private MainClient unMainClient;
 	
 	private boolean estServeur = false;
+	private String estJoueur = "";
 	
 	
 	//static public boolean attenteMessClient = false;
@@ -121,6 +124,7 @@ public class ClientPanel extends Parent {
 		this.scrollReceivedText = new ScrollPane();
 		this.receivedText = new TextFlow();
 		this.sendBtn = new Button();
+		this.rejoindrePartie = new Button();
 		
 
 		//Afficher les élément dont on a besoin
@@ -350,7 +354,7 @@ public class ClientPanel extends Parent {
 		pane.setPrefHeight(600);
 		
 		scrollReceivedText.setLayoutX(650);
-		scrollReceivedText.setLayoutY(25);
+		scrollReceivedText.setLayoutY(10);
 		scrollReceivedText.setPrefWidth(400);
 		scrollReceivedText.setPrefHeight(350);
 		scrollReceivedText.setFitToWidth(true);
@@ -360,7 +364,7 @@ public class ClientPanel extends Parent {
 		
 		textToSend.setEditable(true);
 		textToSend.setLayoutX(650);
-		textToSend.setLayoutY(395);
+		textToSend.setLayoutY(380);
 		textToSend.setPrefWidth(400);
 		textToSend.setPrefHeight(100);
 		textToSend.setWrapText(true);
@@ -371,11 +375,21 @@ public class ClientPanel extends Parent {
 		
 		sendBtn.setVisible(true);
 		sendBtn.setLayoutX(650);
-		sendBtn.setLayoutY(515);
+		sendBtn.setLayoutY(500);
 		sendBtn.setPrefWidth(400);
 		sendBtn.setPrefHeight(50);
 		sendBtn.setText("Envoyer");
 		sendBtn.setStyle(String.format("-fx-font-size:18px; -fx-font-weight:bold; -fx-background-color:#E0E0E0; -fx-background-radius:7px;"
+				+"-fx-border-color:black; -fx-border-radius: 7px; -fx-border-width:2px;"));
+		
+		
+		rejoindrePartie.setVisible(true);
+		rejoindrePartie.setLayoutX(650);
+		rejoindrePartie.setLayoutY(560);
+		rejoindrePartie.setPrefWidth(400);
+		rejoindrePartie.setPrefHeight(50);
+		rejoindrePartie.setText("Rejoindre la partie");
+		rejoindrePartie.setStyle(String.format("-fx-font-size:18px; -fx-font-weight:bold; -fx-background-color:#E0E0E0; -fx-background-radius:7px;"
 				+"-fx-border-color:black; -fx-border-radius: 7px; -fx-border-width:2px;"));
 		
 		
@@ -521,6 +535,16 @@ public class ClientPanel extends Parent {
 			}
 		});
 		
+		rejoindrePartie.setOnAction(new EventHandler<ActionEvent>() 
+		{
+			@Override
+			public void handle(ActionEvent event) 
+			{			
+				unMainClient.GetClient().GetLeClientSend().SetMessAEnvoyer(" rejoin la partie de morpion");
+				unMainClient.GetClient().GetLeClientSend().SetSenderDuMessAEnvoyer("demandeRejoindrePartie");
+				unMainClient.GetClient().GetLeClientSend().EnvoyerLeMessage(true);			
+			}
+		});
 		
 		//Lorsqu'un client valide son inscription
 		btnValiderInscrire.setOnAction(new EventHandler<ActionEvent>() 
@@ -612,7 +636,7 @@ public class ClientPanel extends Parent {
 			     c.setRadius(echelle);
 			     c.setStroke(Color.BLUE);
 			     c.setStrokeWidth(20);	
-			     pane.getChildren().add(c);
+			     pane.getChildren().add(c);		     
 		    }
 		});				
 	}
@@ -705,6 +729,7 @@ public class ClientPanel extends Parent {
 				getChildren().add(scrollReceivedText);
 				getChildren().add(textToSend);
 				getChildren().add(sendBtn);
+				getChildren().add(rejoindrePartie);
 				
 				//Ajout du morpion
 				ajoutMorpionAuFrontEnd();
@@ -763,6 +788,7 @@ public class ClientPanel extends Parent {
 				getChildren().add(scrollReceivedText);
 				getChildren().add(textToSend);
 				getChildren().add(sendBtn);
+				getChildren().add(rejoindrePartie);
 				
 				//Ajout du morpion
 				ajoutMorpionAuFrontEnd();
@@ -813,15 +839,6 @@ public class ClientPanel extends Parent {
 						double x2 = x + echelle;
 						double y2 = y + echelle;
 						
-					    Line line1 = new Line(x1,y1,x2,y2);
-						line1.setStroke(Color.DEEPPINK); 
-						line1.setStrokeWidth(20);
-						getChildren().add(line1);
-						
-						Line line2 = new Line(x1,y2,x2,y1);
-						line2.setStroke(Color.DEEPPINK); 
-						line2.setStrokeWidth(20);
-						getChildren().add(line2);	
 						 
 						// Ajout du clic pour la vérification
 						ax.Ajouter(i);
@@ -836,40 +853,12 @@ public class ClientPanel extends Parent {
 				    	unMainClient.GetClient().GetLeClientSend().SetY1(y1);
 				    	unMainClient.GetClient().GetLeClientSend().SetY2(y2);
 				    	unMainClient.GetClient().GetLeClientSend().SetMessAEnvoyer(" a joué son tour !");
+				    	unMainClient.GetClient().GetLeClientSend().SetSenderDuMessAEnvoyer("demandeDeJouerUnTourMorpion");
 				    	unMainClient.GetClient().GetLeClientSend().EnvoyerLeMessage(true);
 					}
 				}
                     return;
-            }   
-            if (event.getButton() == MouseButton.SECONDARY) {
-                for (int i = 0; i <  t.GetRectangle().length; i++) {
-					if (t.GetRectangle()[i].contains(p)) {
-						// Création graphique du rond				 						 
-						 double x = t.GetMilieu(i).getX();
-						 double y = t.GetMilieu(i).getY();
-						 double echelle = 70;
-						 javafx.scene.shape.Circle c = new Circle();
-					     c.setCenterX(x);
-					     c.setCenterY(y);
-					     c.setRadius(echelle);
-					     c.setStroke(Color.BLUE);
-					     c.setStrokeWidth(20);
-					     getChildren().add(c);
-					     
-					     // Ajout du clic pour la vérification
-						 ao.Ajouter(i);
-				         ao.Verifier();
-				         
-				        //Gestion de l'affichage dans la partit adverse
-				         unMainClient.GetClient().GetLeClientSend().SetX1(x);
-				         unMainClient.GetClient().GetLeClientSend().SetX2(0);
-					     unMainClient.GetClient().GetLeClientSend().SetY1(y);
-					 	 unMainClient.GetClient().GetLeClientSend().SetMessAEnvoyer(" a joué son tour !");
-				    	 unMainClient.GetClient().GetLeClientSend().EnvoyerLeMessage(true);
-					}
-				}
-                   return;
-           } 
+            }    
         });
 	}
 	

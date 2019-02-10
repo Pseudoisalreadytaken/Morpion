@@ -40,9 +40,9 @@ public class ClientSend implements Runnable {
 			//On attend un message
 			while(attenteMess == false)
 			{
-				//on attend 1 seconde
+				//on attend 0.05 sec
 				try {
-				TimeUnit.MILLISECONDS.sleep(400);
+				TimeUnit.MILLISECONDS.sleep(50);
 				}
 				catch (Exception e)
 				{
@@ -58,10 +58,21 @@ public class ClientSend implements Runnable {
 			
 			//Création de l'objet Message avec le message a envoyer
 			Message mess = new Message(senderDuMessAEnvoyer, m, this.pseudo);
+			
+			//Remet le senderDuMessageEnvoyer par defaut
+			this.senderDuMessAEnvoyer = "client";
+			
 			mess.SetX1(x1);
 			mess.SetX2(x2);
 			mess.SetY1(y1);
 			mess.SetY2(y2);
+			
+			//reset des champs location morpion cliquer
+			this.x1 = 0;
+			this.x2 = 0;
+			this.y1 = 0;
+			this.y2 = 0;
+			
 			mess.SetWin(win);
 			try
 			{
@@ -71,8 +82,7 @@ public class ClientSend implements Runnable {
 			catch (Exception e)
 			{
 				System.out.println(e.getMessage());
-			}
-			
+			}		
 		}
 	}
 	

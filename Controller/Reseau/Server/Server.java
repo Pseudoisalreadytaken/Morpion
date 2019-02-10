@@ -9,11 +9,13 @@ public class Server {
 	
 	private int port;
 	private List<ConnectedClient> clients;
+	private List<ConnectedClient> clientsJoueursMorpion;
 	
 	public Server(int unPort)
 	{
 		this.port = unPort;
 		this.clients = new ArrayList<ConnectedClient>();
+		this.clientsJoueursMorpion = new ArrayList<ConnectedClient>();
 		//lancer un thread à partir de la classe Connection.
 		Thread threadConnection = new Thread(new Connection(this));
 		threadConnection.start();
@@ -24,6 +26,12 @@ public class Server {
 	{	
 		//ajoute le client connecté, passé en paramètre, à notre liste clients :
 		this.clients.add(newClient);			
+	}
+	
+	public void addClientDansPartieMorpion(ConnectedClient newClient)
+	{	
+		//ajoute le client connecté, passé en paramètre, à notre liste clients :
+		this.clientsJoueursMorpion.add(newClient);			
 	}
 	
 	//envoie le message mess à tous les clients
@@ -56,5 +64,11 @@ public class Server {
 	public int GetPort()
 	{
 		return this.port;
+	}
+	
+	//permet de retourner la liste des joueur actuel du morpion
+	public List<ConnectedClient> GetListClientJoueurMorpion()
+	{
+		return this.clientsJoueursMorpion;
 	}
 }

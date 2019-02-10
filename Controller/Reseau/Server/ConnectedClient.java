@@ -58,8 +58,52 @@ public class ConnectedClient implements Runnable {
 			{
 				//On attend un nouveau message grâce à l’attribut in :
 				Message mess = (Message) in.readObject();
-				//Une fois un message recu, on l'envoie a tous le monde
-				server.broadcastMessage(mess);
+				boolean envoyerMess = true;
+				
+				//Si il s'agit d'une demande de rejoindre la partie de morpion
+				if (mess.GetSender().equals("demandeRejoindrePartie"))
+				{
+					if (server.GetListClientJoueurMorpion().size() < 2)
+					{
+						server.addClientDansPartieMorpion(this);
+					}
+					else
+					{
+						envoyerMess = false;
+					}
+				}
+				
+				if (mess.GetSender().equals("demandeDeJouerUnTourMorpion"))
+				{
+					boolean estBienUnJoueurMorpion = false;
+					int positionDuJoueurMorpion = 0;
+					for(ConnectedClient unClientJoueurMorpion :server.GetListClientJoueurMorpion())
+					{
+						if (unClientJoueurMorpion.GetId() == this.GetId())
+						{
+							estBienUnJoueurMorpion = true;
+							if (positionDuJoueurMorpion == 0)
+							{
+								mess.SetCroixOuRond("croix");
+							}
+							else
+							{
+								mess.SetCroixOuRond("rond");
+							}
+						}
+						positionDuJoueurMorpion++;
+					}
+					if (estBienUnJoueurMorpion == false)
+					{
+						envoyerMess = false;
+					}
+				}
+				
+				if (envoyerMess)
+				{
+					//Une fois un message recu, on l'envoie a tous le monde
+					server.broadcastMessage(mess);
+				}
 				
 				//Si le message vien d'un client déconnecter, alors on indique au serveur que le client courant vient de
 				//se déconnecter, et on met fin à la boucle while :
