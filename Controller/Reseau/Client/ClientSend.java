@@ -73,7 +73,6 @@ public class ClientSend implements Runnable {
 			this.y1 = 0;
 			this.y2 = 0;
 			
-			mess.SetWin(win);
 			try
 			{
 				out.writeObject(mess);

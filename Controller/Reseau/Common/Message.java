@@ -12,7 +12,6 @@ public class Message implements Serializable{
 	private double Y1;
 	private double Y2;
 	private String croixOuRond;
-	private boolean win = false;
 
 	public Message (String unSender, String unContent, String unPseudoDuSender)
 	{
@@ -75,14 +74,6 @@ public class Message implements Serializable{
 	
 	public void SetCroixOuRond(String uneCroixOuUnRond) {
 		this.croixOuRond = uneCroixOuUnRond;
-	}
-	
-	public boolean GetWin()
-	{
-		return this.win;
-	}
-	public void SetWin(boolean win) {
-		this.win = win;
 	}
 
 }

@@ -60,24 +60,13 @@ public class ClientReceive implements Runnable {
 				System.out.println(pseudo);		
 				if(mess.GetCroixOuRond().equals("croix")) 
 				{
-					Morpion.FrontEnd.ClientPanel.AjouterCroix(mess.GetX1(), mess.GetX2(), mess.GetY1(), mess.GetY2());
+					Morpion.FrontEnd.ClientPanel.AjouterCroix(mess.GetX1(), mess.GetX2(), mess.GetY1(), mess.GetY2(), mess.GetPseudoDuSender());
 				}	
 				else if(mess.GetCroixOuRond().equals("rond"))
 				{
 					double xDuRond = (mess.GetX1() + mess.GetX2())/2;
 					double yDuRond = (mess.GetY1() + mess.GetY2())/2;
-					Morpion.FrontEnd.ClientPanel.AjouterRond(xDuRond,yDuRond);
-				}
-				if(mess.GetWin()) 
-				{
-					Platform.runLater(new Runnable() {
-					    @Override
-					    public void run() {
-							Alert alert = new Alert(AlertType.CONFIRMATION);
-					        alert.setContentText( " gagngé !");
-					        alert.show();
-					    }
-					});		
+					Morpion.FrontEnd.ClientPanel.AjouterRond(xDuRond,yDuRond, mess.GetPseudoDuSender());
 				}
 			}
 			catch (Exception e)
