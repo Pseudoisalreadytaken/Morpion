@@ -39,11 +39,11 @@ import Morpion.BaseDeDonnees.GestionUtilisateur;
 
 public class ClientPanel extends Parent {
 	
-	private String pseudoDuJoueur = "";
+	private static String pseudoDuJoueur = "";
 	
     private Terrain t = new Terrain(600,600);
     private static Analyse ax = new Analyse("x");
-    private Analyse ao = new Analyse("o");
+    private static Analyse ao = new Analyse("o");
 	
 	//Section connexion
 	private Button btnSinscrire;
@@ -84,7 +84,6 @@ public class ClientPanel extends Parent {
 	private static MainClient unMainClient;
 	
 	private boolean estServeur = false;
-	private static int emplacementCliquer;
 	
 	
 	//static public boolean attenteMessClient = false;
@@ -604,11 +603,12 @@ public class ClientPanel extends Parent {
 	//
 	//Dessine une croix sur le morpion de l'adeversaire
 	//
-	public static void AjouterCroix(double x1, double x2, double y1, double y2, String unPseudo) 
+	public static void AjouterCroix(double x1, double x2, double y1, double y2, String unPseudo, int unEmplacementCliquer) 
 	{
 		Platform.runLater(new Runnable() {
 		    @Override
 		    public void run() {
+		        	
 		    	Line line1 = new Line(x1,y1,x2,y2);
 				line1.setStroke(Color.DEEPPINK); 
 				line1.setStrokeWidth(20);
@@ -617,15 +617,19 @@ public class ClientPanel extends Parent {
 				line2.setStroke(Color.DEEPPINK); 
 				line2.setStrokeWidth(20);
 				pane.getChildren().add(line2);
-				
+					
 				// Ajout du clic pour la vérification
-				ax.Ajouter(emplacementCliquer);
+				ax.Ajouter(unEmplacementCliquer);
 				if(ax.Verifier())
 				{
-					unMainClient.GetClient().GetLeClientSend().SetMessAEnvoyer(" a gagné la partie !!!!");
-					unMainClient.GetClient().GetLeClientSend().SetSenderDuMessAEnvoyer("messageVictoireDunJoueur");
-					unMainClient.GetClient().GetLeClientSend().EnvoyerLeMessage(true);	
+					if(unPseudo.equals(pseudoDuJoueur))
+					{
+						unMainClient.GetClient().GetLeClientSend().SetMessAEnvoyer(" a gagné la partie !!!!");
+						unMainClient.GetClient().GetLeClientSend().SetSenderDuMessAEnvoyer("messageVictoireDunJoueur");
+						unMainClient.GetClient().GetLeClientSend().EnvoyerLeMessage(true);	
+					}
 				}
+				
 		    }
 		});		
 	}
@@ -633,7 +637,7 @@ public class ClientPanel extends Parent {
 	//
 	//Dessine un rond sur le morpion de l'adeversaire
 	//
-	public static void AjouterRond(double x, double y, String unPseudo) 
+	public static void AjouterRond(double x, double y, String unPseudo, int unEmplacementCliquer) 
 	{
 		Platform.runLater(new Runnable() {
 		    @Override
@@ -648,13 +652,16 @@ public class ClientPanel extends Parent {
 			     pane.getChildren().add(c);
 			     
 			     // Ajout du clic pour la vérification
-			     ax.Ajouter(emplacementCliquer);
-				if(ax.Verifier())
-				{
-					unMainClient.GetClient().GetLeClientSend().SetMessAEnvoyer(" a gagné la partie !!!!");
-					unMainClient.GetClient().GetLeClientSend().SetSenderDuMessAEnvoyer("messageVictoireDunJoueur");
-					unMainClient.GetClient().GetLeClientSend().EnvoyerLeMessage(true);	
-				}
+			     ao.Ajouter(unEmplacementCliquer);
+				 if(ao.Verifier())
+				 {
+					 if(unPseudo.equals(pseudoDuJoueur))
+					 {
+						 unMainClient.GetClient().GetLeClientSend().SetMessAEnvoyer(" a gagné la partie !!!!");
+						 unMainClient.GetClient().GetLeClientSend().SetSenderDuMessAEnvoyer("messageVictoireDunJoueur");
+						 unMainClient.GetClient().GetLeClientSend().EnvoyerLeMessage(true);
+					 }
+				 }
 		    }
 		});				
 	}
@@ -740,7 +747,8 @@ public class ClientPanel extends Parent {
 				}
 				
 				//Création du client
-				unMainClient = new MainClient("127.0.0.1", textPortCreationServeur.getText(), "[HOST] " + pseudoDuJoueur,ax);
+				pseudoDuJoueur = "[HOST] " + pseudoDuJoueur;
+				unMainClient = new MainClient("127.0.0.1", textPortCreationServeur.getText(), pseudoDuJoueur,ax);
 				
 				//Suppresion des élément plus utile	
 				getChildren().remove(labelCreeServeurSection);
@@ -867,17 +875,18 @@ public class ClientPanel extends Parent {
 						double x2 = x + echelle;
 						double y2 = y + echelle;
 						
-						 
-						emplacementCliquer = i;
+
+				    	//Gestion de l'affichage dans la partit adverse
+					    unMainClient.GetClient().GetLeClientSend().SetX1(x1);
+					    unMainClient.GetClient().GetLeClientSend().SetX2(x2);
+					    unMainClient.GetClient().GetLeClientSend().SetY1(y1);
+					    unMainClient.GetClient().GetLeClientSend().SetY2(y2);
+					    unMainClient.GetClient().GetLeClientSend().SetEmplacementCliquer(i);
+					    unMainClient.GetClient().GetLeClientSend().SetMessAEnvoyer(" a joué son tour !");
+					    unMainClient.GetClient().GetLeClientSend().SetSenderDuMessAEnvoyer("demandeDeJouerUnTourMorpion");
+					    unMainClient.GetClient().GetLeClientSend().EnvoyerLeMessage(true);
+		
 				        
-				        //Gestion de l'affichage dans la partit adverse
-				        unMainClient.GetClient().GetLeClientSend().SetX1(x1);
-				    	unMainClient.GetClient().GetLeClientSend().SetX2(x2);
-				    	unMainClient.GetClient().GetLeClientSend().SetY1(y1);
-				    	unMainClient.GetClient().GetLeClientSend().SetY2(y2);
-				    	unMainClient.GetClient().GetLeClientSend().SetMessAEnvoyer(" a joué son tour !");
-				    	unMainClient.GetClient().GetLeClientSend().SetSenderDuMessAEnvoyer("demandeDeJouerUnTourMorpion");
-				    	unMainClient.GetClient().GetLeClientSend().EnvoyerLeMessage(true);
 					}
 				}
                     return;

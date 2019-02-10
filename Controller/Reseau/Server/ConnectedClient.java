@@ -62,38 +62,79 @@ public class ConnectedClient implements Runnable {
 				
 				//Si il s'agit d'une demande de rejoindre la partie de morpion
 				if (mess.GetSender().equals("demandeRejoindrePartie"))
-				{
+				{		
+					//Si il n'y a pas déjà 2 joueurs
 					if (server.GetListClientJoueurMorpion().size() < 2)
 					{
-						server.addClientDansPartieMorpion(this);
+						for(ConnectedClient unClientJoueurMorpion :server.GetListClientJoueurMorpion())
+						{
+							//Si le joueur est déjà dans la partie
+							if (unClientJoueurMorpion.GetId() == this.GetId())
+							{
+								envoyerMess = false;
+							}
+						}
 					}
 					else
 					{
 						envoyerMess = false;
-					}
+					}					
+					if (envoyerMess) 
+					{
+						server.addClientDansPartieMorpion(this);
+					}				
 				}
+				
 				
 				if (mess.GetSender().equals("demandeDeJouerUnTourMorpion"))
 				{
 					boolean estBienUnJoueurMorpion = false;
-					int positionDuJoueurMorpion = 0;
+					int compteurPositionDuJoueurMorpion = 0;
+					int positionDuJoueurMorpion = -1;
+					
 					for(ConnectedClient unClientJoueurMorpion :server.GetListClientJoueurMorpion())
 					{
+						//Si le joueur est bien dans la partie
 						if (unClientJoueurMorpion.GetId() == this.GetId())
 						{
 							estBienUnJoueurMorpion = true;
-							if (positionDuJoueurMorpion == 0)
+							if (compteurPositionDuJoueurMorpion == 0)
 							{
 								mess.SetCroixOuRond("croix");
+								positionDuJoueurMorpion = 0;
 							}
 							else
 							{
 								mess.SetCroixOuRond("rond");
+								positionDuJoueurMorpion = 1;
 							}
 						}
-						positionDuJoueurMorpion++;
+						compteurPositionDuJoueurMorpion++;
+					}				
+					if (estBienUnJoueurMorpion == true)
+					{
+						int tourDuJoueur = server.GetListEmplacementDejaPrisMorpion().size()%2;
+						//Si c'est bien a ce joueur de jouer
+						if(positionDuJoueurMorpion == tourDuJoueur)
+						{
+							for(Integer unEmplacementDejaPrisMorpion :server.GetListEmplacementDejaPrisMorpion())
+							{
+								if(unEmplacementDejaPrisMorpion == mess.GetEmplacementCliquer())
+								{
+									envoyerMess = false;
+								}
+							}
+							if(envoyerMess == true)
+							{
+								server.GetListEmplacementDejaPrisMorpion().add(mess.GetEmplacementCliquer());
+							}
+						}
+						else
+						{
+							envoyerMess = false;
+						}
 					}
-					if (estBienUnJoueurMorpion == false)
+					else
 					{
 						envoyerMess = false;
 					}

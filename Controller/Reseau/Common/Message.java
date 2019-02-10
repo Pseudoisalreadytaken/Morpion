@@ -12,6 +12,7 @@ public class Message implements Serializable{
 	private double Y1;
 	private double Y2;
 	private String croixOuRond;
+	private int emplacementCliquer;
 
 	public Message (String unSender, String unContent, String unPseudoDuSender)
 	{
@@ -74,6 +75,14 @@ public class Message implements Serializable{
 	
 	public void SetCroixOuRond(String uneCroixOuUnRond) {
 		this.croixOuRond = uneCroixOuUnRond;
+	}
+	
+	public int GetEmplacementCliquer() {
+		return this.emplacementCliquer;
+	}
+	
+	public void SetEmplacementCliquer(int unEmplacementCliquer) {
+		this.emplacementCliquer = unEmplacementCliquer;
 	}
 
 }

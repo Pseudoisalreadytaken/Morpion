@@ -10,6 +10,7 @@ public class Server {
 	private int port;
 	private List<ConnectedClient> clients;
 	private List<ConnectedClient> clientsJoueursMorpion;
+	private List<Integer> emplacementDejaPrisMorpion = new ArrayList<Integer>();
 	
 	public Server(int unPort)
 	{
@@ -70,5 +71,11 @@ public class Server {
 	public List<ConnectedClient> GetListClientJoueurMorpion()
 	{
 		return this.clientsJoueursMorpion;
+	}
+	
+	//permet de retourner la liste des emplacement déja pris sur le morpion
+	public List<Integer> GetListEmplacementDejaPrisMorpion()
+	{
+		return this.emplacementDejaPrisMorpion;
 	}
 }
