@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -600,6 +601,42 @@ public class ClientPanel extends Parent {
 	//Les METHODE
 	//
 	
+	
+	//
+	//Reset le morpion graphiquement
+	//
+	public static void Reset()
+	{
+		Platform.runLater(new Runnable() {
+		    @Override
+		    public void run() {
+		    	List<Line> lineSuppr = new ArrayList<Line>();
+		    	List<Circle> circleSuppr = new ArrayList<Circle>();
+				for (Node child : pane.getChildren()) 
+				{						
+					if(child.getClass().getName().equals("javafx.scene.shape.Line"))
+					{
+						lineSuppr.add((Line)child);
+					}
+					if(child.getClass().getName().equals("javafx.scene.shape.Circle"))
+					{
+						circleSuppr.add((Circle)child);
+					}
+				}
+				for (Line line : lineSuppr) 
+				{
+					pane.getChildren().remove(line);
+				}
+				for (Circle circle : circleSuppr) 
+				{
+					pane.getChildren().remove(circle);
+				}
+			    Analyse ax = new Analyse("x");
+			    Analyse ao = new Analyse("o");
+		    }
+		});		
+		
+	}
 	//
 	//Dessine une croix sur le morpion de l'adeversaire
 	//
@@ -623,10 +660,15 @@ public class ClientPanel extends Parent {
 				if(ax.Verifier())
 				{
 					if(unPseudo.equals(pseudoDuJoueur))
-					{
+					{		
+						Reset();
+						Analyse ax = new Analyse("x");
+					    Analyse ao = new Analyse("o");
 						unMainClient.GetClient().GetLeClientSend().SetMessAEnvoyer(" a gagné la partie !!!!");
 						unMainClient.GetClient().GetLeClientSend().SetSenderDuMessAEnvoyer("messageVictoireDunJoueur");
+						unMainClient.GetClient().GetLeClientSend().SetReset(true);
 						unMainClient.GetClient().GetLeClientSend().EnvoyerLeMessage(true);	
+						
 					}
 				}
 				
@@ -657,9 +699,13 @@ public class ClientPanel extends Parent {
 				 {
 					 if(unPseudo.equals(pseudoDuJoueur))
 					 {
+						 Reset();
+						 Analyse ax = new Analyse("x");
+						 Analyse ao = new Analyse("o");
 						 unMainClient.GetClient().GetLeClientSend().SetMessAEnvoyer(" a gagné la partie !!!!");
 						 unMainClient.GetClient().GetLeClientSend().SetSenderDuMessAEnvoyer("messageVictoireDunJoueur");
-						 unMainClient.GetClient().GetLeClientSend().EnvoyerLeMessage(true);
+						 unMainClient.GetClient().GetLeClientSend().SetReset(true);
+						 unMainClient.GetClient().GetLeClientSend().EnvoyerLeMessage(true);	
 					 }
 				 }
 		    }

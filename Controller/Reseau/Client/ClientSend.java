@@ -23,6 +23,7 @@ public class ClientSend implements Runnable {
 	private double y1;
 	private double y2;
 	private int emplacementCliquer;
+	boolean reset = false;
 	
 	public ClientSend(Socket unSocket, ObjectOutputStream unOut, String unPseudo)
 	{
@@ -77,6 +78,8 @@ public class ClientSend implements Runnable {
 			//reset des champs emplcaementCliquer
 			this.emplacementCliquer = -1;
 			
+			mess.SetReset(reset);
+
 			try
 			{
 				out.writeObject(mess);
@@ -120,6 +123,10 @@ public class ClientSend implements Runnable {
 	public void SetEmplacementCliquer(int unEmplacementCliquer)
 	{
 		this.emplacementCliquer = unEmplacementCliquer;
+	}
+	public void SetReset(boolean reset)
+	{
+		this.reset = reset;
 	}
 
 }

@@ -57,7 +57,10 @@ public class ClientReceive implements Runnable {
 				mess = (Message) in.readObject();
 				//On ajoute le messsage sur le FrontEnd
 				Morpion.FrontEnd.ClientPanel.AjouterMess(mess.GetContent(), mess.GetSender());
-				System.out.println(pseudo);		
+				if(mess.GetReset()) 
+				{
+					Morpion.FrontEnd.ClientPanel.Reset();
+				}
 				if(mess.GetCroixOuRond().equals("croix")) 
 				{
 					Morpion.FrontEnd.ClientPanel.AjouterCroix(mess.GetX1(), mess.GetX2(), mess.GetY1(), mess.GetY2(), mess.GetPseudoDuSender(), mess.GetEmplacementCliquer());
@@ -68,6 +71,8 @@ public class ClientReceive implements Runnable {
 					double yDuRond = (mess.GetY1() + mess.GetY2())/2;
 					Morpion.FrontEnd.ClientPanel.AjouterRond(xDuRond,yDuRond, mess.GetPseudoDuSender(), mess.GetEmplacementCliquer());
 				}
+				System.out.println(mess.GetPseudoDuSender() + "  pseudo   "+mess.GetSender() +"  sender   "+mess.GetContent() +"  content");
+				
 			}
 			catch (Exception e)
 			{

@@ -13,6 +13,7 @@ public class Message implements Serializable{
 	private double Y2;
 	private String croixOuRond;
 	private int emplacementCliquer;
+	private boolean reset = false;
 
 	public Message (String unSender, String unContent, String unPseudoDuSender)
 	{
@@ -83,6 +84,14 @@ public class Message implements Serializable{
 	
 	public void SetEmplacementCliquer(int unEmplacementCliquer) {
 		this.emplacementCliquer = unEmplacementCliquer;
+	}
+	public boolean GetReset()
+	{
+		return this.reset;
+	}
+	public void SetReset(boolean reset)
+	{
+		this.reset = reset;
 	}
 
 }
