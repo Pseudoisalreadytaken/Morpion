@@ -1,5 +1,6 @@
 package Morpion.BaseDeDonnees;
 
+import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -7,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class GestionUtilisateur {
 	
@@ -30,9 +32,21 @@ public class GestionUtilisateur {
 			System.out.println(e.getMessage());
 		}
 		
-		String url = "jdbc:oracle:thin:@iutdoua-oracle.univ-lyon1.fr:1521:orcl";
-		String utilisateur = "p1811851";
-		String motDePasse = "le_mot_de_passe";
+		//Récupération des données pour la BDD
+		Properties prop = new Properties();
+		try
+		{
+			FileInputStream input = new FileInputStream("superGlobaleBDD.properties");
+			prop.load(input);
+		}
+		catch (Exception e)
+		{
+			System.out.println(e.getMessage());
+		}
+
+		String url = prop.getProperty("url");
+		String utilisateur = prop.getProperty("utilisateur");
+		String motDePasse = prop.getProperty("motDePasse");
 		
 		//Tentative de connexion à la base de données
 		Connection connexionALaBDD = GetConnection(url, utilisateur, motDePasse);
