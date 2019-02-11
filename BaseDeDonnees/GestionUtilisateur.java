@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+
 public class GestionUtilisateur {
 	
 	
@@ -36,7 +37,7 @@ public class GestionUtilisateur {
 		Properties prop = new Properties();
 		try
 		{
-			FileInputStream input = new FileInputStream("superGlobaleBDD.properties");
+			FileInputStream input = new FileInputStream("src/Morpion/BaseDeDonnees/superGlobaleBDD.properties");
 			prop.load(input);
 		}
 		catch (Exception e)
@@ -61,9 +62,8 @@ public class GestionUtilisateur {
 		try
 		{
 			Connection laConnexionBDD = ConnexionBDD();
-			
 			Statement state = laConnexionBDD.createStatement();
-			ResultSet result = state.executeQuery("SELECT * FROM UTILISATEURMORPION;");
+			ResultSet result = state.executeQuery("SELECT * FROM UTILISATEURMORPION");
 			while (result.next()) {
 				listeDesUtilisateursBDD.add(result.getString("pseudo"));
 			}
@@ -84,7 +84,7 @@ public class GestionUtilisateur {
 			Connection laConnexionBDD = ConnexionBDD();
 			
 			Statement state = laConnexionBDD.createStatement();
-			int result = state.executeUpdate("INSERT INTO UTILISATEURMORPION (pseudo, motDePasse) VALUES ('" + unPseudo + "', '" + unMotDePasse + "');");	
+			int result = state.executeUpdate("INSERT INTO UTILISATEURMORPION (pseudo, motDePasse) VALUES ('" + unPseudo + "', '" + unMotDePasse + "')");	
 		}
 		catch (Exception e)
 		{
@@ -102,11 +102,15 @@ public class GestionUtilisateur {
 			Connection laConnexionBDD = ConnexionBDD();
 			
 			Statement state = laConnexionBDD.createStatement();
-			ResultSet result = state.executeQuery("SELECT * FROM UTILISATEURMORPION WHERE pseudo = '" + unPseudo + "';");
-			if (result.getString("motDePasse").equals(unMotDePasse))
-			{
-				laVerifMdp = true;
+			ResultSet result = state.executeQuery("SELECT * FROM UTILISATEURMORPION WHERE pseudo = '" + unPseudo + "'");
+			
+			while (result.next()) {
+				if (result.getString("motDePasse").equals(unMotDePasse))
+				{
+					laVerifMdp = true;
+				}
 			}
+
 		}
 		catch (Exception e)
 		{

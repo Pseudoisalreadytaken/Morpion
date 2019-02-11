@@ -453,7 +453,7 @@ public class ClientPanel extends Parent {
 			@Override
 			public void handle(ActionEvent event) 
 			{
-				int tmp = 1;
+				//int tmp = 1;
 				
 				String lePseudoDeUtilisateurConnexion = textPseudoJoueur.getText();
 				String leMdpDeUtilisateurConnexion = textMotDePasseJoueur.getText();
@@ -472,11 +472,11 @@ public class ClientPanel extends Parent {
 				}
 				
 				//Si le pseudo existe dans la BDD
-				if(pseudoExisteDansBDD || tmp == 1)
+				if(pseudoExisteDansBDD)
 				{				
 					boolean verifDuMdpSaisi = Morpion.BaseDeDonnees.GestionUtilisateur.verifierMotDePasseBDD(lePseudoDeUtilisateurConnexion, leMdpDeUtilisateurConnexion);		
 					//Si c'est le bon mot de passe
-					if(verifDuMdpSaisi || tmp == 1)
+					if(verifDuMdpSaisi)
 					{
 						pseudoDuJoueur = textPseudoJoueur.getText();
 						
@@ -564,11 +564,11 @@ public class ClientPanel extends Parent {
 						if(unUtilisateur.equals(lePseudoDuNouvelleUtilisateur))
 						{
 							//Alerte l'utilisateur que son pseudo est déjà utilisé
-							Alert alertDeconnexionHote = new Alert(AlertType.INFORMATION);
-							alertDeconnexionHote.setTitle("Inscription");
-							alertDeconnexionHote.setHeaderText("Votre nom d'utilisateur est déjà utilisé");
-							alertDeconnexionHote.setContentText("Merci de choisir un autre nom d'utilisateur");
-							alertDeconnexionHote.showAndWait();
+							Alert alertPseudoDejaPris = new Alert(AlertType.INFORMATION);
+							alertPseudoDejaPris.setTitle("Inscription");
+							alertPseudoDejaPris.setHeaderText("Votre nom d'utilisateur est déjà utilisé");
+							alertPseudoDejaPris.setContentText("Merci de choisir un autre nom d'utilisateur");
+							alertPseudoDejaPris.showAndWait();
 							pseudoDejaUtiliser = true;
 							break;
 						}
@@ -577,6 +577,30 @@ public class ClientPanel extends Parent {
 					if (pseudoDejaUtiliser == false)
 					{
 						Morpion.BaseDeDonnees.GestionUtilisateur.AjouterUnUtilisateur(lePseudoDuNouvelleUtilisateur, leMdpDuNouvelleUtilisateur);
+						//Alerte l'utilisateur que son compte à été crée
+						Alert alertCompteCree = new Alert(AlertType.INFORMATION);
+						alertCompteCree.setTitle("Inscription");
+						alertCompteCree.setHeaderText("Votre inscription à été pris en compte");
+						alertCompteCree.setContentText("Vous pouvez maintenant vous connecter.");
+						alertCompteCree.showAndWait();
+						
+						//Suppresion des élément plus utile		
+						getChildren().remove(btnRetourConnexion);
+						getChildren().remove(labelSinscrireSection);
+						getChildren().remove(labelInscriptionPseudoJoueur);
+						getChildren().remove(textInscriptionPseudoJoueur);
+						getChildren().remove(labelInscriptionMotDePasseJoueur);
+						getChildren().remove(textInscriptionMotDePasseJoueur);
+						getChildren().remove(btnValiderInscrire);
+						
+						//Ajout des élément utile
+						getChildren().add(btnSinscrire);
+						getChildren().add(labelSeConnecterSection);
+						getChildren().add(labelPseudoJoueur);
+						getChildren().add(textPseudoJoueur);
+						getChildren().add(labelMotDePasseJoueur);
+						getChildren().add(textMotDePasseJoueur);
+						getChildren().add(btnSeConnecter);
 					}
 				}
 				else
