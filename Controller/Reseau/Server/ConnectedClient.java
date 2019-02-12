@@ -127,6 +127,11 @@ public class ConnectedClient implements Runnable {
 							if(envoyerMess == true)
 							{
 								server.GetListEmplacementDejaPrisMorpion().add(mess.GetEmplacementCliquer());
+								//Si toute les cases ont été cocher mais qu'il n'y a toujours pas de gagnant
+								if (server.GetListEmplacementDejaPrisMorpion().size() == 9 && !mess.GetSender().equals("messageVictoireDunJoueur"))
+								{
+									mess.SetSender("messageDerniereCaseCocher");
+								}
 							}
 						}
 						else
@@ -139,6 +144,17 @@ public class ConnectedClient implements Runnable {
 						envoyerMess = false;
 					}
 				}
+				
+				
+				
+				//Si il s'agit d'un message de victoire d'un joueur ou d'égalité
+				if (mess.GetSender().equals("messageVictoireDunJoueur") || mess.GetSender().equals("messageDerniereCaseCocher"))
+				{		
+					
+					server.GetListClientJoueurMorpion().clear();
+					server.GetListEmplacementDejaPrisMorpion().clear();
+				}
+				
 				
 				if (envoyerMess)
 				{

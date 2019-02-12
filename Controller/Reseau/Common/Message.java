@@ -11,7 +11,7 @@ public class Message implements Serializable{
 	private double X2;
 	private double Y1;
 	private double Y2;
-	private String croixOuRond;
+	private String croixOuRond = "";
 	private int emplacementCliquer;
 
 	public Message (String unSender, String unContent, String unPseudoDuSender)

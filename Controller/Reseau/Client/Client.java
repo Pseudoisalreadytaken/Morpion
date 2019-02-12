@@ -19,10 +19,6 @@ public class Client {
 	private ObjectInputStream in;
 	private ObjectOutputStream out;
 	
-	private Socket socketClick;
-	private ObjectInputStream inClick;
-	private ObjectOutputStream outClick;
-	
 	private Thread threadClientSend;
 	private Thread threadClientReceive;
 	private ClientSend leClientSend;
@@ -38,8 +34,7 @@ public class Client {
 		{			
 			this.socket = new Socket(this.address, this.port);
 			this.out = new ObjectOutputStream(this.socket.getOutputStream());
-			this.socketClick = new Socket(this.address, this.port);
-			this.outClick = new ObjectOutputStream(this.socketClick.getOutputStream());
+
 		}
 		catch (Exception e)
 		{
@@ -78,7 +73,6 @@ public class Client {
 			threadClientSend.interrupt();
 			threadClientReceive.sleep(100);
 			threadClientReceive.interrupt();
-			
 			this.in.close();
 			this.out.close();
 			this.socket.close();

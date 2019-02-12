@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -26,9 +27,12 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import javafx.embed.swing.JFXPanel;
 
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import javax.swing.Timer;
 
 import Morpion.Controller.Jeu.Analyse;
 import Morpion.Controller.Jeu.Terrain;
@@ -41,7 +45,7 @@ public class ClientPanel extends Parent {
 	
 	private static String pseudoDuJoueur = "";
 	
-    private Terrain t = new Terrain(600,600);
+    private static Terrain t = new Terrain(600,600);
     private static Analyse ax = new Analyse("x");
     private static Analyse ao = new Analyse("o");
 	
@@ -627,7 +631,7 @@ public class ClientPanel extends Parent {
 	//
 	//Dessine une croix sur le morpion de l'adeversaire
 	//
-	public static void AjouterCroix(double x1, double x2, double y1, double y2, String unPseudo, int unEmplacementCliquer) 
+	public static void AjouterCroix(double x1, double x2, double y1, double y2, String unPseudo, int unEmplacementCliquer, Message leMessage) 
 	{
 		Platform.runLater(new Runnable() {
 		    @Override
@@ -644,14 +648,35 @@ public class ClientPanel extends Parent {
 					
 				// Ajout du clic pour la vérification
 				ax.Ajouter(unEmplacementCliquer);
-				if(ax.Verifier())
+				//Si c'est la fin de la partie
+				if(ax.Verifier() || leMessage.GetSender().equals("messageDerniereCaseCocher"))
 				{
 					if(unPseudo.equals(pseudoDuJoueur))
 					{
-						unMainClient.GetClient().GetLeClientSend().SetMessAEnvoyer(" a gagné la partie !!!!");
-						unMainClient.GetClient().GetLeClientSend().SetSenderDuMessAEnvoyer("messageVictoireDunJoueur");
-						unMainClient.GetClient().GetLeClientSend().EnvoyerLeMessage(true);	
+						//Si il y a un gagnant
+						if (ax.Verifier())
+						{
+							unMainClient.GetClient().GetLeClientSend().SetMessAEnvoyer(" a gagné la partie !!!!\nLe morpion va être réinitialisé");
+							unMainClient.GetClient().GetLeClientSend().SetSenderDuMessAEnvoyer("messageVictoireDunJoueur");
+						}
+						else
+						{
+							unMainClient.GetClient().GetLeClientSend().SetSenderDuMessAEnvoyer("messagePartieFiniEgaliter");
+						}
+						unMainClient.GetClient().GetLeClientSend().EnvoyerLeMessage(true);
+						
 					}
+
+					ActionListener resetLeMorpion = new ActionListener() {
+						@Override
+						public void actionPerformed(java.awt.event.ActionEvent evenement) {
+							ResetMorpion();
+							((Timer)evenement.getSource()).stop();
+						}
+					 };
+					 Timer leTimerResetMorpion = new Timer(5000, resetLeMorpion);
+					 leTimerResetMorpion.start();
+					 
 				}
 				
 		    }
@@ -661,7 +686,7 @@ public class ClientPanel extends Parent {
 	//
 	//Dessine un rond sur le morpion de l'adeversaire
 	//
-	public static void AjouterRond(double x, double y, String unPseudo, int unEmplacementCliquer) 
+	public static void AjouterRond(double x, double y, String unPseudo, int unEmplacementCliquer, Message leMessage) 
 	{
 		Platform.runLater(new Runnable() {
 		    @Override
@@ -677,14 +702,32 @@ public class ClientPanel extends Parent {
 			     
 			     // Ajout du clic pour la vérification
 			     ao.Ajouter(unEmplacementCliquer);
-				 if(ao.Verifier())
+			     //Si c'est la fin de la partie
+				 if(ao.Verifier() || leMessage.GetSender().equals("messageDerniereCaseCocher"))
 				 {
-					 if(unPseudo.equals(pseudoDuJoueur))
-					 {
-						 unMainClient.GetClient().GetLeClientSend().SetMessAEnvoyer(" a gagné la partie !!!!");
-						 unMainClient.GetClient().GetLeClientSend().SetSenderDuMessAEnvoyer("messageVictoireDunJoueur");
-						 unMainClient.GetClient().GetLeClientSend().EnvoyerLeMessage(true);
+
+					if(unPseudo.equals(pseudoDuJoueur))
+					{
+						//Si il y a un gagnant
+						if (ao.Verifier())
+						{
+							unMainClient.GetClient().GetLeClientSend().SetMessAEnvoyer(" a gagné la partie !!!!\nLe morpion va être réinitialisé");
+							unMainClient.GetClient().GetLeClientSend().SetSenderDuMessAEnvoyer("messageVictoireDunJoueur");
+							unMainClient.GetClient().GetLeClientSend().EnvoyerLeMessage(true);
+						}
+						
 					 }
+					 
+					 ActionListener resetLeMorpion = new ActionListener() {
+						@Override
+						public void actionPerformed(java.awt.event.ActionEvent evenement) {
+							ResetMorpion();
+							((Timer)evenement.getSource()).stop();
+						}
+					 };
+					 Timer leTimerResetMorpion = new Timer(5000, resetLeMorpion);
+					 leTimerResetMorpion.start();
+
 				 }
 		    }
 		});				
@@ -713,7 +756,7 @@ public class ClientPanel extends Parent {
 					messageAEnvoye.setTextFill(Color.web("#0abde3"));
 				}
 				
-				if (leSender.equals("demandeDeJouerUnTourMorpion") || leSender.equals("demandeRejoindrePartie"))
+				if (leSender.equals("demandeDeJouerUnTourMorpion") || leSender.equals("demandeRejoindrePartie") || leSender.equals("messageDerniereCaseCocher"))
 				{
 					messageAEnvoye.setTextFill(Color.web("#D6A2E8"));
 				}
@@ -721,6 +764,12 @@ public class ClientPanel extends Parent {
 				if (leSender.equals("messageVictoireDunJoueur"))
 				{
 					messageAEnvoye.setTextFill(Color.web("#e1b12c"));
+				}
+				
+				if (leSender.equals("messagePartieFiniEgaliter"))
+				{
+					messageAEnvoye.setTextFill(Color.web("#574b90"));
+					messageAEnvoye.setText("Égalité, fin de la partie\nLe morpion va être réinitialisé");
 				}
 				
 				if (leSender.equals("ServeurDeconnecter"))
@@ -916,6 +965,43 @@ public class ClientPanel extends Parent {
                     return;
             }    
         });
+	}
+	
+	
+
+	//Reset le morpion graphiquement
+	public static void ResetMorpion()
+	{
+		Platform.runLater(new Runnable() {
+		    @Override
+		    public void run() {
+		    	List<Line> lineSuppr = new ArrayList<Line>();
+		    	List<Circle> circleSuppr = new ArrayList<Circle>();
+				for (Node child : pane.getChildren()) 
+				{						
+					if(child.getClass().getName().equals("javafx.scene.shape.Line"))
+					{
+						lineSuppr.add((Line)child);
+					}
+					if(child.getClass().getName().equals("javafx.scene.shape.Circle"))
+					{
+						circleSuppr.add((Circle)child);
+					}
+				}
+				for (Line line : lineSuppr) 
+				{
+					pane.getChildren().remove(line);
+				}
+				for (Circle circle : circleSuppr) 
+				{
+					pane.getChildren().remove(circle);
+				}
+			    ax = new Analyse("x");
+			    ao = new Analyse("o");
+			    t = new Terrain(600,600);
+		    }
+		});		
+
 	}
 	
 	
